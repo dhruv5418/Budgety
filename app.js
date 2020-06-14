@@ -130,6 +130,25 @@ var UIController = (function(){
         container: '.container',
         expencesPercentageLabel:'.item__percentage'
     };
+    var formateNumber=function(num,type){
+        /* 
+        * + or - before number exactly 2 decimal points
+        coma separating thousands
+        */
+        var numSplit,int,dec;
+        num = Math.abs(num);
+        num = num.toFixed(2);
+        numSplit = num.split('.');
+        int = numSplit[0];
+        if(int.length > 3){
+            int = int.substr(0,int.length - 3)+','+int.substr(int.length - 3,3);
+        }
+        dec = numSplit[1];
+
+        
+        return (type==='exp'?'-':'+') +' '+int+'.'+dec;
+
+    };
 
     return{
         getInput: function(){
@@ -153,7 +172,7 @@ var UIController = (function(){
             //Replace the placeholder text with some actual data
             newHtml=html.replace('%id%',obj.id);
             newHtml=newHtml.replace('%description%',obj.description);
-            newHtml=newHtml.replace('%value%',obj.value);
+            newHtml=newHtml.replace('%value%',formateNumber(obj.value,type));
             //Insert the HTML into 
             document.querySelector(element).insertAdjacentHTML('beforeend',newHtml);
         },
@@ -172,9 +191,12 @@ var UIController = (function(){
             fieldsArr[0].focus();
         },
         displayBudget: function(obj){
-            document.querySelector(DOMStrings.budgetLabel).textContent = obj.budget;
-            document.querySelector(DOMStrings.incomeLabel).textContent = obj.totalInc;
-            document.querySelector(DOMStrings.expenceLabel).textContent = obj.totalExp;
+
+            obj.budget>0?type='inc':type='exp';
+
+            document.querySelector(DOMStrings.budgetLabel).textContent =formateNumber(obj.budget,type) ;
+            document.querySelector(DOMStrings.incomeLabel).textContent = formateNumber(obj.totalInc,'inc');
+            document.querySelector(DOMStrings.expenceLabel).textContent = formateNumber(obj.totalExp,'exp');
             if(obj.percentage>0){
                 document.querySelector(DOMStrings.percentageLabel).textContent = obj.percentage + '%';
             }else{
@@ -198,6 +220,7 @@ var UIController = (function(){
                 }
             });
         },
+       
         getDOMStrings: function(){
             return DOMStrings;
         }
